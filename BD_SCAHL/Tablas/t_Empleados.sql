@@ -1,9 +1,9 @@
 --
 -- Tabla: Empleados
 --
-DROP TABLE IF EXISTS public.Empleados;
+-- DROP TABLE IF EXISTS Empleados;
 
-CREATE TABLE IF NOT EXISTS public.Empleados
+CREATE TABLE IF NOT EXISTS Empleados
 (
     Cedula        NUMERIC(11,0)  CONSTRAINT nn_Empleados_Cedula        NOT NULL
    ,Nombres       VARCHAR(30)    CONSTRAINT nn_Empleados_Nombres       NOT NULL
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.Empleados
 )
 TABLESPACE pg_default;
 --
-ALTER TABLE IF EXISTS public.Empleados
+ALTER TABLE IF EXISTS Empleados
     OWNER to postgres;
 --
 -- Comentarios de la tabla y de las columnas de cada tabla
