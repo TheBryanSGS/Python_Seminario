@@ -37,6 +37,6 @@ COMMENT ON COLUMN Empleados.Horas_Diarias IS 'Lista de horas que el empleado rea
 COMMENT ON COLUMN Empleados.Salario_Base  IS 'Salario base del empleado';
 COMMENT ON COLUMN Empleados.Nacimiento    IS 'Fecha de nacimiento del empleado';
 COMMENT ON COLUMN Empleados.Direccion     IS 'Direccion del empleado';
-COMMENT ON COLUMN Empleados.Estado_Civil  IS 'Codigo de estado civil';
+COMMENT ON COLUMN Empleados.Estado_Civil  IS 'Codigo de estado civil: S-Soltero, C-Casado, U-Union libre, P-Separado, D-Divorciado, V-Viudo';
 COMMENT ON COLUMN Empleados.Hijos         IS 'Numero de Hijos que tiene el empleado';
 COMMENT ON COLUMN Empleados.Email         IS 'Correo electronico del empleado';
