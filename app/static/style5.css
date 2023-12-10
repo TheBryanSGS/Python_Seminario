@@ -119,7 +119,7 @@ body {
     margin-top: 23px;
     cursor: pointer;
     transition: all 0.5s ease;
-    text-align: center; /* Alinea el texto al centro dentro del botón */
+    text-align: center; 
   }
   
   .reporte-btn:hover {
@@ -132,8 +132,8 @@ body {
 }
 
 .back-btn {
-    width: 50px; /* Ajusta el ancho según sea necesario */
-    height: 50px; /* Ajusta la altura según sea necesario */
+    width: 50px; 
+    height: 50px; 
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s ease;

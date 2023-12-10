@@ -101,11 +101,12 @@ body {
   }
   
   .registro-btn {
-    padding: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 15px;
     width: 100%;
     height: 50px;
     border: none;
-    font-size: 16px;
     border-radius: 80px;
     background-color: rgb(58, 143, 255);
     color: black;
@@ -113,7 +114,7 @@ body {
     margin-top: 23px;
     cursor: pointer;
     transition: all 0.5s ease;
-    text-align: center; /* Alinea el contenido del botón al centro */
+    text-align: center; 
   }
   
   .registro-btn:hover {
