@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS Asistencia_Empleados
     Identif  NUMERIC(7,0)   DEFAULT    NEXTVAL('s_Asistencia_Empleados')
    ,Cedula   NUMERIC(11,0)  CONSTRAINT nn_Asistencia_Empleados_Cedula    NOT NULL
    ,Ingreso  TIMESTAMPTZ    DEFAULT    CURRENT_TIMESTAMP
-   ,Salida   TIMESTAMPTZ
+   ,Salida   TIMESTAMPTZ    DEFAULT    CURRENT_TIMESTAMP
    ,Horas_Ex NUMERIC(2,0)   DEFAULT 0
    ,Usua_Cre VARCHAR(20)    CONSTRAINT nn_Asistencia_Empleados_Usua_Cre  NOT NULL
    ,Usua_Mod VARCHAR(20)

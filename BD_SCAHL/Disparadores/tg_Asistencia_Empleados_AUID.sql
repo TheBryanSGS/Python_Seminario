@@ -1,5 +1,13 @@
-CREATE OR REPLACE FUNCTION tf_Asistencia_Empleados_AUID()
-RETURNS TRIGGER AS $$
+-- FUNCTION: public.tf_asistencia_empleados_auid()
+
+-- DROP FUNCTION IF EXISTS public.tf_asistencia_empleados_auid();
+
+CREATE OR REPLACE FUNCTION public.tf_asistencia_empleados_auid()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
 DECLARE
 	--
 	v_Accion_Antes TEXT;
@@ -10,12 +18,13 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
     	--
 		v_Accion_Despues := 'Identif: ' || NEW.Identif
-						|| ',Cedula: '  || NEW.Cedula
-						|| ',Ingreso: ' || NEW.Ingreso
-						|| ',Salida: '  || NEW.Salida
-						|| ',Horas_Ex: '|| NEW.Horas_Ex
-						|| ',Usua_Cre: '|| NEW.Usua_Cre
-						|| ',Usua_Mod: '|| NEW.Usua_Mod;
+					   || ', Cedula: '  || NEW.Cedula
+					   || ', Ingreso: ' || TO_CHAR(NEW.Ingreso, 'YYYY-MM-DD HH:MI AM')
+					   || ', Salida: '  || COALESCE(TO_CHAR(NEW.Salida, 'YYYY-MM-DD HH:MI AM'), '')
+					   || ', Horas_Ex: '|| COALESCE(TO_CHAR(NEW.Horas_Ex, '99'), '')
+					   || ', Usua_Cre: '|| NEW.Usua_Cre
+					   || ', Usua_Mod: '|| COALESCE(NEW.Usua_Mod, '')
+						;
 		--
 		INSERT INTO auditoria (
 								 Id_Usuario
@@ -28,7 +37,7 @@ BEGIN
 					   VALUES (
 					   			 NEW.Usua_Cre
 						   		,'asistencia_empleados'
-						   		,'INSERTANDO'
+						   		,'INS'
 						        ,'N/A'
 						   		,v_Accion_Despues
 						        ,CURRENT_TIMESTAMP
@@ -36,21 +45,23 @@ BEGIN
 		--
 	ELSIF TG_OP = 'UPDATE' THEN
     	--
-		v_Accion_Antes := 'Identif: ' || OLD.Identif
-					  || ',Cedula: '  || OLD.Cedula
-					  || ',Ingreso: ' || OLD.Ingreso
-					  || ',Salida: '  || OLD.Salida
-					  || ',Horas_Ex: '|| OLD.Horas_Ex
-					  || ',Usua_Cre: '|| OLD.Usua_Cre
-					  || ',Usua_Mod: '|| OLD.Usua_Mod;
+		v_Accion_Antes :=   'Identif: ' || OLD.Identif
+					   || ', Cedula: '  || OLD.Cedula
+					   || ', Ingreso: ' || TO_CHAR(OLD.Ingreso, 'YYYY-MM-DD HH:MI AM')
+					   || ', Salida: '  || COALESCE(TO_CHAR(OLD.Salida, 'YYYY-MM-DD HH:MI AM'), '')
+					   || ', Horas_Ex: '|| COALESCE(TO_CHAR(OLD.Horas_Ex, '99'), '')
+					   || ', Usua_Cre: '|| OLD.Usua_Cre
+					   || ', Usua_Mod: '|| COALESCE(OLD.Usua_Mod, '')
+					   ;
 		--
 		v_Accion_Despues := 'Identif: ' || NEW.Identif
-						|| ',Cedula: '  || NEW.Cedula
-						|| ',Ingreso: ' || NEW.Ingreso
-						|| ',Salida: '  || NEW.Salida
-						|| ',Horas_Ex: '|| NEW.Horas_Ex
-						|| ',Usua_Cre: '|| NEW.Usua_Cre
-						|| ',Usua_Mod: '|| NEW.Usua_Mod;
+					   || ', Cedula: '  || NEW.Cedula
+					   || ', Ingreso: ' || TO_CHAR(NEW.Ingreso, 'YYYY-MM-DD HH:MI AM')
+					   || ', Salida: '  || TO_CHAR(NEW.Salida, 'YYYY-MM-DD HH:MI AM')
+					   || ', Horas_Ex: '|| COALESCE(TO_CHAR(NEW.Horas_Ex, '99'), '')
+					   || ', Usua_Cre: '|| NEW.Usua_Cre
+					   || ', Usua_Mod: '|| NEW.Usua_Mod
+					   ;
 		--
 		INSERT INTO auditoria (
 								 Id_Usuario
@@ -63,7 +74,7 @@ BEGIN
 					   VALUES (
 					   			 NEW.Usua_Mod
 						   		,'asistencia_empleados'
-						   		,'ACTUALIZANDO'
+						   		,'UPD'
 						        ,v_Accion_Antes
 						   		,v_Accion_Despues
 						        ,CURRENT_TIMESTAMP
@@ -72,12 +83,13 @@ BEGIN
 	ELSE
     	--
 		v_Accion_Antes := 'Identif: ' || OLD.Identif
-					  || ',Cedula: '  || OLD.Cedula
-					  || ',Ingreso: ' || OLD.Ingreso
-					  || ',Salida: '  || OLD.Salida
-					  || ',Horas_Ex: '|| OLD.Horas_Ex
-					  || ',Usua_Cre: '|| OLD.Usua_Cre
-					  || ',Usua_Mod: '|| OLD.Usua_Mod;
+					 || ', Cedula: '  || OLD.Cedula
+					 || ', Ingreso: ' || TO_CHAR(OLD.Ingreso, 'YYYY-MM-DD HH:MI AM')
+					 || ', Salida: '  || COALESCE(TO_CHAR(OLD.Salida, 'YYYY-MM-DD HH:MI AM'), '')
+					 || ', Horas_Ex: '|| COALESCE(TO_CHAR(OLD.Horas_Ex, '99'), '')
+					 || ', Usua_Cre: '|| OLD.Usua_Cre
+					 || ', Usua_Mod: '|| COALESCE(OLD.Usua_Mod, '')
+					   ;
 		--
 		INSERT INTO auditoria (
 								 Id_Usuario
@@ -88,9 +100,9 @@ BEGIN
 								,Fech_Reg
 							  )
 					   VALUES (
-					   			 NEW.Usua_Mod
+					   			 COALESCE(OLD.Usua_Mod, OLD.Usua_Cre)
 						   		,'asistencia_empleados'
-						   		,'BORRANDO'
+						   		,'DEL'
 						        ,v_Accion_Antes
 						   		,'N/A'
 						        ,CURRENT_TIMESTAMP
@@ -100,10 +112,7 @@ BEGIN
 	--
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$BODY$;
 
-CREATE OR REPLACE TRIGGER tg_Asistencia_Empleados_AUID
-AFTER INSERT OR UPDATE OR DELETE ON Asistencia_Empleados
-FOR EACH ROW
-EXECUTE FUNCTION tf_Asistencia_Empleados_AUID()
-;
+ALTER FUNCTION public.tf_asistencia_empleados_auid()
+    OWNER TO postgres;
