@@ -72,6 +72,8 @@ class ConextionDB:
         except Exception as Ex: return f"Ocurrio un ERROR: {Ex}"
         #--
     #--
+    def generar_Reporte(self, ):
+
     def validar_Existencia(self, cedula):
         #--
         try:

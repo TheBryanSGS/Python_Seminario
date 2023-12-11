@@ -1,8 +1,8 @@
--- FUNCTION: public.tf_asistencia_empleados_auid()
+-- Funcion Trigger: tf_asistencia_empleados_auid()
 
--- DROP FUNCTION IF EXISTS public.tf_asistencia_empleados_auid();
+-- DROP FUNCTION IF EXISTS tf_asistencia_empleados_auid();
 
-CREATE OR REPLACE FUNCTION public.tf_asistencia_empleados_auid()
+CREATE OR REPLACE FUNCTION tf_asistencia_empleados_auid()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -114,5 +114,11 @@ BEGIN
 END;
 $BODY$;
 
-ALTER FUNCTION public.tf_asistencia_empleados_auid()
+ALTER FUNCTION tf_asistencia_empleados_auid()
     OWNER TO postgres;
+
+CREATE OR REPLACE TRIGGER tg_asistencia_empleados_auid
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON asistencia_empleados
+    FOR EACH ROW
+    EXECUTE FUNCTION tf_asistencia_empleados_auid();
