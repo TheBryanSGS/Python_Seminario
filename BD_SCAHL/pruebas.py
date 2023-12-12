@@ -1,5 +1,5 @@
 import psycopg2
-import datetime
+from datetime import datetime
 
 class ConextionDB:
     #--
@@ -72,7 +72,18 @@ class ConextionDB:
         except Exception as Ex: return f"Ocurrio un ERROR: {Ex}"
         #--
     #--
-    def generar_Reporte(self, ):
+    def generar_Reporte(self, fecha_ini, fecha_fin):
+        #--
+        str_fecha_ini = fecha_ini.strftime("%Y-%m-%d")
+        str_fecha_fin = fecha_fin.strftime("%Y-%m-%d")
+        #--
+        sql = "SELECT cedula, nombre_completo, cargo, area, TO_CHAR(ingreso, 'DD-MM-YYYY HH:MI AM'), TO_CHAR(salida, 'DD-MM-YYYY HH:MI AM'), horas_extra "\
+                "FROM v_registro_asistencias "\
+               "WHERE ingreso BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"\
+                " AND salida  BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"
+        self.__cursor.execute(sql)
+        return self.__cursor.fetchall()
+        #--
 
     def validar_Existencia(self, cedula):
         #--
@@ -106,7 +117,7 @@ class ConextionDB:
     #--
     def Validar_Horas_Extra(self, cedula):
         #--
-        dia_semana = datetime.datetime.now().weekday() + 1
+        dia_semana = datetime.now().weekday() + 1
         sql = "SELECT COALESCE(Horas_Diarias[" + str(dia_semana) + "], 0) "\
                 "FROM Empleados "\
                "WHERE Cedula = " + str(cedula)
@@ -133,10 +144,16 @@ class ConextionDB:
 
 instanciaDB = ConextionDB()
 USER = 'egforero'
+registro = []
 try:
-    cedula = int(input("Ingrese la cedula del empleado\n"))
-    Ingresar = instanciaDB.Empleado_Sale(cedula, USER)
-    print(Ingresar)
+    for fila in instanciaDB.generar_Reporte(datetime(2023, 12, 9), datetime(2023, 12, 11)):
+        celdas = ''
+        for celda in fila:
+            celdas += str(celda) + ';'
+        registro.append(celdas[:-1])
+
+    for fila in registro:
+        print(fila)
     instanciaDB.__del__()
 except ValueError:      print('Formato de numero no valido')
 except Exception as Ex: print(Ex)
