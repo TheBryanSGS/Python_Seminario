@@ -50,7 +50,7 @@ class ConextionDB:
                 #--
                 #Si el empleado no esta en las instalaciones, insertelo
                 #--
-                if not self.validar_Asistencia(cedula):
+                if self.validar_Asistencia(cedula) is None:
                     #--
                     sql = "INSERT INTO Asistencia_Empleados ("\
                               "Cedula"\
@@ -80,7 +80,7 @@ class ConextionDB:
             #--
             if self.validar_Existencia(cedula) is not None:
                 #--
-                if self.validar_Asistencia(cedula):
+                if self.validar_Asistencia(cedula) is not None:
                     #--
                     horas_Extra = self.Validar_Horas_Extra(cedula)
                     sql = "UPDATE Asistencia_Empleados "\
@@ -104,17 +104,41 @@ class ConextionDB:
     #--
     #Metodo que permite generar la consulta de un reporte para exportarlo a un archivo csv
     #--
-    def generar_Reporte(self, fecha_ini, fecha_fin):
+    def consultar_Reporte(self, fecha_ini, fecha_fin, usuario):
         #--
-        str_fecha_ini = fecha_ini.strftime("%Y-%m-%d")
-        str_fecha_fin = fecha_fin.strftime("%Y-%m-%d")
+        if self.validar_Permisos(usuario) is not None:
+            str_fecha_ini = fecha_ini.strftime("%Y-%m-%d")
+            str_fecha_fin = fecha_fin.strftime("%Y-%m-%d")
+            #--
+            sql = "SELECT cedula, nombre_completo, cargo, area, TO_CHAR(ingreso, 'DD-MM-YYYY HH:MI AM'), TO_CHAR(salida, 'DD-MM-YYYY HH:MI AM'), horas_extra "\
+                    "FROM v_registro_asistencias "\
+                   "WHERE ingreso BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"\
+                    " AND salida  BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"
+            self.__cursor.execute(sql)
+            return self.__cursor.fetchall()
         #--
-        sql = "SELECT cedula, nombre_completo, cargo, area, TO_CHAR(ingreso, 'DD-MM-YYYY HH:MI AM'), TO_CHAR(salida, 'DD-MM-YYYY HH:MI AM'), horas_extra "\
-                "FROM v_registro_asistencias "\
-               "WHERE ingreso BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"\
-                " AND salida  BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"
-        self.__cursor.execute(sql)
-        return self.__cursor.fetchall()
+    #--
+    #Metodo que genera el reporte para el formato csv
+    #--
+    def generar_Reporte(self, consulta):
+        #--
+        try:
+            #--
+            registro = []
+            print(consulta)
+            for fila in consulta:
+                #--
+                celdas = ''
+                for celda in fila:
+                    #--
+                    celdas += str(celda) + ';'
+                    #--
+                registro.append(celdas[:-1])
+                #--
+            #--
+            return registro
+            #--
+        except Exception as Ex: print(Ex)
         #--
     #--
     #Metodo que valida la existencia de un empleado en la empresa por medio de su cedula
@@ -127,10 +151,9 @@ class ConextionDB:
                     'FROM Empleados '\
                    "WHERE Cedula = " + str(cedula)
             self.__cursor.execute(sql)
-            exist = self.__cursor.fetchone()
-            return exist
+            return self.__cursor.fetchone()
             #--
-        except Exception as Ex: f"Ocurrio un ERROR: {Ex}"
+        except Exception as Ex: return f"Ocurrio un ERROR: {Ex}"
         #--
     #--
     #Metodo que valida la asistencia de un empleado en la empresa por medio de su cedula
@@ -144,11 +167,9 @@ class ConextionDB:
                    'WHERE Cedula = ' + str(cedula) +\
                     ' AND Salida IS NULL'
             self.__cursor.execute(sql)
-            exist = self.__cursor.fetchone()
+            return self.__cursor.fetchone()
             #--
-            return True if exist is not None else False
-            #--
-        except Exception as Ex: f"Ocurrio un ERROR: {Ex}" 
+        except Exception as Ex: return f"Ocurrio un ERROR: {Ex}" 
         #--
     #--
     #Metodo que calcula el numero de horas extra del empleado
@@ -178,6 +199,22 @@ class ConextionDB:
         #Si las horas realizadas son mayores a las horas laborales realizadas, retornar el numero de
         #horas extra
         return (horas_realizadas - hora_laboral) if horas_realizadas > hora_laboral else 0
+        #--
+    #--
+    #Valida los permisos de un usuario para generar reportes
+    #--
+    def validar_Permisos(self, usuario):
+        #--
+        try:
+            #--
+            sql = "SELECT 1 "\
+                    "FROM usuarios "\
+                   "WHERE nombre = '" + usuario + "' "\
+                     "AND 'GR' = ANY(permisos)"
+            self.__cursor.execute(sql)
+            return self.__cursor.fetchone()
+            #--
+        except Exception as Ex: return f"Ocurrio un ERROR: {Ex}"
         #--
     #--
     def __del__(self):
@@ -224,17 +261,11 @@ except Exception as Ex: print(f"Ocurrio un ERROR: {Ex}")
 '''
 #Logica para obtener el csv NO BORRAR
 '''
-registro = []
-try:
-    for fila in instanciaDB.generar_Reporte(datetime(2023, 12, 9), datetime(2023, 12, 11)):
-        celdas = ''
-        for celda in fila:
-            celdas += str(celda) + ';'
-        registro.append(celdas[:-1])
+instanciaDB = ConextionDB()
 
-    for fila in registro:
-        print(fila)
-    instanciaDB.__del__()
-except ValueError:      print('Formato de numero no valido')
-except Exception as Ex: print(Ex)
+if instanciaDB.validar_Permisos('aateheran') is not None:
+    #--
+    registros = [(';'.join(map(str,fila))) for fila in instanciaDB.consultar_Reporte(datetime(2023, 12, 9), datetime(2023, 12, 11), 'aateheran')]
+    for linea in registros:
+        print(linea)
 '''
