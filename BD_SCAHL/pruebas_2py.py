@@ -1,6 +1,48 @@
 from pruebas import ConextionDB
 from datetime import datetime
+import os
+import openpyxl
 
+def generar_Excel(registros):
+    #--
+    try:
+        #--
+        encabezados = [ 
+            'Cedula'
+           ,'Nombre Completo'
+           ,'Cargo'
+           ,'Area'
+           ,'Fecha/Hora Ingreso'
+           ,'Fecha/Hora Salida'
+           ,'Horas Extra'
+        ]
+        #--
+        # Crear un nuevo libro de Excel
+        libro_excel = openpyxl.Workbook()
+
+        # Seleccionar la hoja activa (por defecto, hay una hoja llamada "Sheet")
+        hoja_activa = libro_excel.active
+
+        # Agregar encabezados a la hoja de trabajo
+        hoja_activa.append(encabezados)
+
+        # Escribir los registros en la hoja de Excel
+        for fila in registros:
+            hoja_activa.append(fila.split(';'))
+
+        # Obtener el directorio de descargas del usuario
+        directorio_descargas = os.path.expanduser("~\Downloads")
+
+        # Concatenar la ruta del archivo
+        ruta_archivo = os.path.join(directorio_descargas, 'Registro' + datetime.now().strftime("%Y-%m-%d") + '.xlsx')
+
+        # Guardar el libro de Excel en el directorio de descargas
+        libro_excel.save(ruta_archivo)
+        #--
+        return "Archivo Excel generado con exito"
+        #--
+    except Exception as Ex: return f"ERROR en generar_Excel:\n{Ex}"
+#--
 instanciaDB = ConextionDB()
 #--
 try:
@@ -61,13 +103,10 @@ try:
                 #--
                 if permisos is not None and type(permisos) is tuple:
                     #--
-                    while True:
-                        #Verificar fechas
-                        registro = instanciaDB.generar_Reporte(datetime(2023, 12, 11), datetime.now())
-                        #generar archivo csv
-                        for linea in registro: print(linea)
-                        break
-                        #--
+                    print(generar_Excel(
+                        instanciaDB.generar_Reporte(datetime(2023, 12, 11), datetime.now())
+                        ))
+                    #--
                 elif permisos is None: print("Usted no tiene permisos para generar reportes")
                 else: print(f"ERROR en validar_Permisos:\n{permisos}")
                 #--
