@@ -223,39 +223,4 @@ class ConextionDB:
         self.__conextion.close()
         #--
     #--
-'''
 #--
-#----------------------------------------------------------------------------------------
-#main()
-instanciaDB = ConextionDB()
-#--
-try:
-    #--
-    USER = input("Ingrese el usuario\n")
-    PSWD = input("Ingrese la contraseña\n").encode()
-    #--
-    if instanciaDB.iniciar_Sesion(USER, PSWD) == "Acceso exitoso":
-        #--
-        print("Acceso exitoso")
-        opcion = ""
-        #--
-        while opcion != "3":
-            #--
-            print("Disque los botones:",
-                  "1. Ingresar empleado.",
-                  "2. Generar reporte.",
-                  "3. Salir",
-                  sep = "\n")
-            opcion = input()
-            #--
-            if opcion == "1":
-                #--
-                opcion_1 = ""
-                print("Disque los botones:",
-                      "1. El empleado va a ingresar.",
-                      "2. El empleado va a salir.",
-                      sep = "\n")
-                #--
-    instanciaDB.__del__()
-except Exception as Ex: print(f"Ocurrio un ERROR: {Ex}")
-'''
