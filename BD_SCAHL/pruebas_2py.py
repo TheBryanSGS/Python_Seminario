@@ -1,4 +1,5 @@
 from pruebas import ConextionDB
+from datetime import datetime
 
 instanciaDB = ConextionDB()
 #--
@@ -61,11 +62,8 @@ try:
                 if permisos is not None and type(permisos) is tuple:
                     #--
                     while True:
-                        #--
-                        fecha_ini = input("Ingrese la fecha de inicio en formato YYYY-MM-DD")
-                        fecha_fin = input("Ingrese la fecha de fin en formato YYYY-MM-DD")
                         #Verificar fechas
-                        registro = instanciaDB.generar_Reporte(fecha_ini, fecha_fin)
+                        registro = instanciaDB.generar_Reporte(datetime(2023, 12, 11), datetime.now())
                         #generar archivo csv
                         for linea in registro: print(linea)
                         break

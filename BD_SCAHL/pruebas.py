@@ -12,7 +12,8 @@ class ConextionDB:
             self.__conextion = psycopg2.connect(
                 database = 'DB_SCAHL',
                 user = 'postgres',
-                password = 'Santiago123.')
+                password = 'Santiago123.',
+                port = '5432')
             self.__cursor = self.__conextion.cursor()
             #--
         except Exception as Ex: f"Ocurrio un ERROR: {Ex}"
@@ -95,7 +96,9 @@ class ConextionDB:
                 if asiste is not None and type(asiste) is tuple:
                     #--
                     horas_Extra = self.validar_Horas_Extra(cedula)
+                    #--
                     if type(horas_Extra) is not str:
+                        #--
                         sql = "UPDATE Asistencia_Empleados "\
                                  "SET horas_ex = " + str(horas_Extra) +\
                                     ",Salida = CURRENT_TIMESTAMP"\
@@ -106,7 +109,7 @@ class ConextionDB:
                         self.__cursor.execute(sql)
                         self.__conextion.commit()
                         #--
-                        return "Empleado registrado correctamente"
+                        return "Empleado registrado correctamente" + (f"\nAdemas, realizo {horas_Extra} horas extra, por favor notificar" if horas_Extra > 0 else "")
                         #--
                     else: return f"ERROR en validar_Horas_Extra:\n{horas_Extra}"
                     #--
@@ -130,10 +133,10 @@ class ConextionDB:
             #--
             sql = "SELECT cedula, nombre_completo, cargo, area, TO_CHAR(ingreso, 'DD-MM-YYYY HH:MI AM'), TO_CHAR(salida, 'DD-MM-YYYY HH:MI AM'), horas_extra "\
                     "FROM v_registro_asistencias "\
-                   "WHERE ingreso BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"\
-                    " AND salida  BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD')"
+                   "WHERE ingreso BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD') + INTERVAL '1 day'"\
+                    "  OR salida  BETWEEN TO_DATE('" + str_fecha_ini + "', 'YYYY-MM-DD') AND TO_DATE('" + str_fecha_fin + "', 'YYYY-MM-DD') + INTERVAL '1 day'"
             self.__cursor.execute(sql)
-            return [(';'.join(map(str,fila))) for fila in self.__cursor.fetchall()]
+            return [(';'.join(map(lambda x: str(x) if x is not None else " ",fila))) for fila in self.__cursor.fetchall()]
             #--
         except Exception as Ex: return f"ERROR en consultar_Reporte{Ex}"
         #--
