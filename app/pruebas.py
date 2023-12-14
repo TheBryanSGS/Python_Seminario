@@ -34,7 +34,6 @@ class ConextionDB:
             if validar_contrasena is not None:
                 #--
                 if bcrypt.verify(contrasena, validar_contrasena[0].encode()): 
-                    self.USER = usuario
                     return "Acceso exitoso"
                 #--
             #--
@@ -44,7 +43,7 @@ class ConextionDB:
     #--
     #Metodo que permite realizar el registro de un empleado que entro a las instalaciones
     #--
-    def empleado_Ingresa(self, cedula):
+    def empleado_Ingresa(self, cedula, usuario):
         #--
         try:
             #--
@@ -65,7 +64,7 @@ class ConextionDB:
                           ") VALUES ("\
                              + str(cedula)\
                            + ",NULL"\
-                           + ",'" + self.USER + "')"
+                           + ",'" + usuario + "')"
                     #--
                     self.__cursor.execute(sql)
                     self.__conextion.commit()
@@ -82,7 +81,7 @@ class ConextionDB:
     #--
     #Metodo que permite realizar el registro de un empleado que sale de las instalaciones
     #--
-    def empleado_Sale(self, cedula):
+    def empleado_Sale(self, cedula, usuario):
         #--
         try:
             #--
@@ -103,7 +102,7 @@ class ConextionDB:
                         sql = "UPDATE Asistencia_Empleados "\
                                  "SET horas_ex = " + str(horas_Extra) +\
                                     ",Salida = CURRENT_TIMESTAMP"\
-                                    ",usua_mod = '" + self.USER + "'"\
+                                    ",usua_mod = '" + usuario + "'"\
                               " WHERE Cedula = "+ str(cedula) +\
                                 " AND Salida IS NULL"
                         #--
@@ -207,13 +206,13 @@ class ConextionDB:
     #--
     #Valida los permisos de un usuario para generar reportes
     #--
-    def validar_Permisos(self):
+    def validar_Permisos(self, usuario):
         #--
         try:
             #--
             sql = "SELECT 1 "\
                     "FROM usuarios "\
-                   "WHERE nombre = '" + self.USER + "' "\
+                   "WHERE nombre = '" + usuario + "' "\
                      "AND 'GR' = ANY(permisos)"
             self.__cursor.execute(sql)
             return self.__cursor.fetchone()

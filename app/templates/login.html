@@ -17,6 +17,14 @@
             </div>
             <div ng-app ng-init="checked = false">
                 <form class="form-signin" action="" method="post" name="form">
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <p class="error" style ="font-size: 16px; color:rgba(255, 255, 255, 0.932);"{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% csrf_token %}
                     <label for="username">ID usuario:</label>
                     <input class="form-styling" type="text" name="username" placeholder="" required/>
                     <label for="password">Contraseña:</label>
@@ -24,7 +32,7 @@
                     <input type="checkbox" id="checkbox"/>
                     <label for="checkbox"><span class="ui"></span>Mantener la sesión iniciada.</label>
                     <div class="btn-animate">
-                        <a type="submit" class="btn-signin" href="{% url 'opciones' %}">Iniciar sesión</a>
+                        <button type="submit" class="btn-signin" href="{% url 'opciones' %}">Iniciar sesión</button>
                     </div>
                 </form>
             </div>
