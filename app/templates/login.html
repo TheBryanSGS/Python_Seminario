@@ -16,7 +16,11 @@
                 </ul>
             </div>
             <div ng-app ng-init="checked = false">
-                <form class="form-signin" action="" method="post" name="form">
+
+            
+                <form class="form-signin" action="{% url 'login' %}" method="post" name="form">
+                    {% csrf_token %}
+                
                     <label for="username">ID usuario:</label>
                     <input class="form-styling" type="text" name="username" placeholder="" required/>
                     <label for="password">Contraseña:</label>
@@ -24,9 +28,9 @@
                     <input type="checkbox" id="checkbox"/>
                     <label for="checkbox"><span class="ui"></span>Mantener la sesión iniciada.</label>
                     <div class="btn-animate">
-                        <a type="submit" class="btn-signin" href="{% url 'opciones' %}">Iniciar sesión</a>
+                        <button type="submit" class="btn-signin">Iniciar sesión</button>
                     </div>
-                </form>
+                </form
             </div>
         </div>
     </div>
