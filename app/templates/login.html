@@ -16,7 +16,11 @@
                 </ul>
             </div>
             <div ng-app ng-init="checked = false">
-                <form class="form-signin" action="" method="post" name="form">
+
+            
+                <form class="form-signin" action="{% url 'login' %}" method="post" name="form">
+                    {% csrf_token %}
+                
                     {% if messages %}
                         <ul class="messages">
                             {% for message in messages %}
@@ -34,7 +38,7 @@
                     <div class="btn-animate">
                         <button type="submit" class="btn-signin" href="{% url 'opciones' %}">Iniciar sesión</button>
                     </div>
-                </form>
+                </form
             </div>
         </div>
     </div>

@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect
 from .pruebas import ConextionDB
 from django.contrib import messages
+from django.shortcuts import render, redirect
+from .pruebas import ConextionDB
+from django.contrib import messages
+import bcrypt
 
 
 def index(request):
